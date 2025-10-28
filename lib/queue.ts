@@ -1,5 +1,5 @@
 const BeeQueue = eval("require")("bee-queue") as typeof import("bee-queue");
-
+// import BeeQueue from "bee-queue";
 import redisConfig from "./redis-config";
 
 export function createQueue<T>(name: string, isWorker = false) {

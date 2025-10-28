@@ -1,20 +1,23 @@
+import "dotenv/config";
 import { createQueue } from "../lib/queue";
 import prisma from "@/lib/prisma";
-
-export const imageGraderQueueWorker = createQueue<{ imageId: string }>(
+export const imageGraderQueueWorker = createQueue<{ imagePath: string }>(
   "image-grader",
   true
 );
 
 imageGraderQueueWorker.process(5, async (job) => {
   console.log(`⚙️ Processing image grader job`);
-  const imageId = job.data.imageId;
+  const { imagePath } = job.data;
+  console.log(imagePath);
   try {
-    const image = await prisma.image.findUnique({
+    const image = await prisma.image.findFirst({
       where: {
-        id: imageId,
+        imagePath: { equals: imagePath.toString() },
       },
     });
+
+    console.log(image);
     if (!image) {
       throw new Error("Image not found");
     }

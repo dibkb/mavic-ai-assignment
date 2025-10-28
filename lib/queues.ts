@@ -1,5 +1,5 @@
 import { createQueue } from "./queue";
 
-export const imageGraderQueue = createQueue<{ imageId: string }>(
+export const imageGraderQueue = createQueue<{ imagePath: string }>(
   "image-grader"
 );
