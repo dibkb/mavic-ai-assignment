@@ -1,7 +1,8 @@
 import { createStep } from "@mastra/core/workflows";
 import { z } from "zod";
 
-import { aggregateScores, AggregatorOutputSchema } from "../agents/aggregator";
+import { aggregateScores } from "../agents/aggregator";
+import { AggregatorOutputSchema } from "../../lib/types/workflow/aggregator";
 
 const aggregatorStep = createStep({
   id: "aggregator-step",

@@ -1,6 +1,7 @@
 import { createStep } from "@mastra/core/workflows";
 import { z } from "zod";
 import sizeAgent from "../agents/size-agent";
+import { SizeOutputSchema } from "../../lib/types/workflow/size";
 import openai from "../providers/open-ai";
 
 const sizeWorkflow = createStep({
@@ -11,11 +12,7 @@ const sizeWorkflow = createStep({
     imageUrl: z.url(),
     channel: z.string().optional(),
   }),
-  outputSchema: z.object({
-    score: z.number(),
-    matches: z.boolean(),
-    details: z.string(),
-  }),
+  outputSchema: SizeOutputSchema,
   execute: async ({ inputData }) => {
     if (!inputData) {
       throw new Error("Trigger data not found");

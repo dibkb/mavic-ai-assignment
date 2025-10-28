@@ -1,6 +1,7 @@
 import { createStep } from "@mastra/core/workflows";
 import { z } from "zod";
 import moodAgent from "../agents/mood-agent";
+import { MoodOutputSchema } from "../../lib/types/workflow/mood";
 import openai from "../providers/open-ai";
 
 const moodWorkflow = createStep({
@@ -11,12 +12,7 @@ const moodWorkflow = createStep({
     imageUrl: z.url(),
     channel: z.string().optional(),
   }),
-  outputSchema: z.object({
-    score: z.number(),
-    moodPrompt: z.array(z.string()),
-    moodImage: z.array(z.string()),
-    matchScore: z.number(),
-  }),
+  outputSchema: MoodOutputSchema,
   execute: async ({ inputData }) => {
     if (!inputData) {
       throw new Error("Trigger data not found");

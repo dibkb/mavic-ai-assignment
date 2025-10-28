@@ -1,6 +1,7 @@
 import { createStep } from "@mastra/core/workflows";
 import { z } from "zod";
 import creativityAgent from "../agents/creativity-agent";
+import { CreativityOutputSchema } from "../../lib/types/workflow/creativity";
 import openai from "../providers/open-ai";
 
 const creativityWorkflow = createStep({
@@ -11,14 +12,7 @@ const creativityWorkflow = createStep({
     imageUrl: z.url(),
     channel: z.string().optional(),
   }),
-  outputSchema: z.object({
-    score: z.number(),
-    factors: z.object({
-      colorVariance: z.number(),
-      entropy: z.number(),
-      promptTokenVariety: z.number(),
-    }),
-  }),
+  outputSchema: CreativityOutputSchema,
   execute: async ({ inputData }) => {
     if (!inputData) {
       throw new Error("Trigger data not found");

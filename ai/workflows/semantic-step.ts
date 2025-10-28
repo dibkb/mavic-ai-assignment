@@ -1,6 +1,7 @@
 import { createStep } from "@mastra/core/workflows";
 import { z } from "zod";
 import semanticsAgent from "../agents/semantics-agent";
+import { SemanticOutputSchema } from "../../lib/types/workflow/semantic";
 import openai from "../providers/open-ai";
 
 const semanticWorkflow = createStep({
@@ -11,11 +12,7 @@ const semanticWorkflow = createStep({
     imageUrl: z.url(),
     channel: z.string().optional(),
   }),
-  outputSchema: z.object({
-    score: z.number(),
-    matchedKeywords: z.array(z.string()),
-    similarity: z.number(),
-  }),
+  outputSchema: SemanticOutputSchema,
   execute: async ({ inputData }) => {
     if (!inputData) {
       throw new Error("Trigger data not found");
