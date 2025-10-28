@@ -154,7 +154,7 @@ export default function GenerateImages() {
         {sortedImages.map((img: Image) => (
           <section key={img.imagePath} className="space-y-2">
             <div className="border p-2 rounded-md space-y-2 flex flex-col justify-between">
-              <Media img={img} />
+              <Media img={{ imagePath: img.imagePath, prompt: img.prompt }} />
               <section>
                 <p
                   className={cn(
