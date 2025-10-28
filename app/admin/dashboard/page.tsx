@@ -1,4 +1,12 @@
 "use client";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Tab } from "@/lib/types/nuqs";
 import { useQueryState } from "nuqs";
 import { z } from "zod";
@@ -21,5 +29,30 @@ export default function Dashboard() {
       content = <div>Brands content</div>;
   }
 
-  return <div className="p-8">{content}</div>;
+  const tabLabelMap: Record<Tab, string> = {
+    [Tab.Brands]: "Brands",
+    [Tab.GenerateImages]: "Generate Images",
+    [Tab.EvaluatedImages]: "Evaluated Images",
+  };
+
+  return (
+    <div className="p-8 space-y-4">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/admin/dashboard">Dashboard</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{tabLabelMap[tab as Tab]}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      {content}
+    </div>
+  );
 }
