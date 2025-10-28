@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -21,7 +21,7 @@ model User {
   userId    String   @unique
   userName  String
   userRole  UserRole
-  // images    Image[]
+  images    Image[]
   password  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -30,4 +30,54 @@ model User {
 enum UserRole {
   user
   admin
+}
+
+model Brand {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  brandId           String   @unique
+  brandName         String
+  brandDescription  String
+  style             String
+  brandVision       String
+  brandVoice        String
+  colors            String[]
+  images            Image[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Image {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  imagePath       String
+  prompt          String
+  model           String
+  channel         String
+  timestamp       DateTime
+  user            User         @relation(fields: [userId], references: [id])
+  userId          String       @db.ObjectId
+  brand           Brand        @relation(fields: [brandId], references: [id])
+  brandId         String       @db.ObjectId
+  evaluations     Evaluation[]
+  latestEndScore  Float?
+  lastEvaluatedAt DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Evaluation {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  image     Image      @relation(fields: [imageId], references: [id])
+  imageId   String     @db.ObjectId
+  status    EvalStatus @default(pending)
+  evaluator String
+  agents    Json
+  endScore  Float
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+enum EvalStatus {
+  pending
+  completed
+  failed
 }
