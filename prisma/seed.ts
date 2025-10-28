@@ -27,9 +27,10 @@ async function parseCSV(filePath: string) {
 
 async function seed() {
   console.log("🚀 Seeding MongoDB...");
+  await prisma.evaluation.deleteMany();
   await prisma.image.deleteMany();
-  await prisma.user.deleteMany();
   await prisma.brand.deleteMany();
+  await prisma.user.deleteMany();
   console.log("✅ Cleared existing data");
 
   const usersFile = path.join(process.cwd(), "data", "users.csv");
