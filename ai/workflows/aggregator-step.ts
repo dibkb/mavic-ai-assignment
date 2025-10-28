@@ -8,25 +8,24 @@ const aggregatorStep = createStep({
   description:
     "Runs all evaluation agents in parallel and aggregates their scores into a final endScore and confidence.",
   inputSchema: z.object({
-    originalPrompt: z.string(),
-    imageUrl: z.url(),
-    sizeWorkflow: z.object({
+    "size-workflow": z.object({
       score: z.number(),
       matches: z.boolean(),
       details: z.string(),
+      channel: z.string().optional(),
     }),
-    moodWorkflow: z.object({
+    "mood-workflow": z.object({
       score: z.number(),
       moodPrompt: z.array(z.string()),
       moodImage: z.array(z.string()),
       matchScore: z.number(),
     }),
-    semanticsWorkflow: z.object({
+    "semantic-workflow": z.object({
       score: z.number(),
       matchedKeywords: z.array(z.string()),
       similarity: z.number(),
     }),
-    creativityWorkflow: z.object({
+    "creativity-workflow": z.object({
       score: z.number(),
       factors: z.object({
         colorVariance: z.number(),
@@ -70,10 +69,10 @@ const aggregatorStep = createStep({
     }
     const {
       weights,
-      creativityWorkflow,
-      sizeWorkflow,
-      moodWorkflow,
-      semanticsWorkflow,
+      "creativity-workflow": creativityWorkflow,
+      "size-workflow": sizeWorkflow,
+      "mood-workflow": moodWorkflow,
+      "semantic-workflow": semanticWorkflow,
     } = inputData;
 
     const { endScore, confidence } = aggregateScores({
@@ -81,7 +80,7 @@ const aggregatorStep = createStep({
         creativity: creativityWorkflow.score,
         size: sizeWorkflow.score,
         mood: moodWorkflow.score,
-        semantics: semanticsWorkflow.score,
+        semantics: semanticWorkflow.score,
       },
       weights: weights ?? {},
     });
@@ -92,7 +91,7 @@ const aggregatorStep = createStep({
       creativity: creativityWorkflow,
       size: sizeWorkflow,
       mood: moodWorkflow,
-      semantics: semanticsWorkflow,
+      semantics: semanticWorkflow,
     } as const;
   },
 });

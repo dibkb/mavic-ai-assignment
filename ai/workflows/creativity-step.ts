@@ -9,6 +9,7 @@ const creativityWorkflow = createStep({
   inputSchema: z.object({
     originalPrompt: z.string(),
     imageUrl: z.url(),
+    channel: z.string().optional(),
   }),
   outputSchema: z.object({
     score: z.number(),

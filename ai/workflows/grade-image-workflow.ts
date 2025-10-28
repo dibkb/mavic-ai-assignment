@@ -11,6 +11,7 @@ export const gradeImageWorkflow = createWorkflow({
   inputSchema: z.object({
     originalPrompt: z.string(),
     imageUrl: z.url(),
+    channel: z.string().optional(),
   }),
   outputSchema: z.object({
     output: z.string(),

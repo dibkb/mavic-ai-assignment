@@ -9,6 +9,7 @@ const sizeWorkflow = createStep({
   inputSchema: z.object({
     originalPrompt: z.string(),
     imageUrl: z.url(),
+    channel: z.string().optional(),
   }),
   outputSchema: z.object({
     score: z.number(),
@@ -19,13 +20,13 @@ const sizeWorkflow = createStep({
     if (!inputData) {
       throw new Error("Trigger data not found");
     }
-    const { originalPrompt, imageUrl } = inputData;
+    const { originalPrompt, imageUrl, channel } = inputData;
 
     const response = await sizeAgent.generate(
       [
         {
           role: "user",
-          content: `Original prompt: ${originalPrompt}\nImage URL: ${imageUrl}`,
+          content: `Original prompt: ${originalPrompt}\nImage URL: ${imageUrl}\nChannel: ${channel}`,
         },
       ],
       {
