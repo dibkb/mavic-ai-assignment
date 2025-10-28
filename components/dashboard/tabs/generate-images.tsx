@@ -1,6 +1,7 @@
 "use client";
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Image, ImagesResponse } from "@/lib/types/image";
 import Media from "../media";
@@ -30,9 +31,31 @@ const fetchImages = async (): Promise<ImagesResponse> => {
 };
 
 export default function GenerateImages() {
+  const [evaluating, setEvaluating] = useState<string[]>([]);
   const { data, isLoading, error } = useQuery({
     queryKey: ["images"],
     queryFn: fetchImages,
+  });
+
+  const evalMutation = useMutation({
+    mutationFn: async (imagePath: string) => {
+      const res = await axios.post<{ jobId: number }>("/api/admin/evaluate", {
+        imagePath,
+      });
+      return res.data;
+    },
+    onMutate: (imagePath: string) => {
+      setEvaluating((prev) => [...prev, imagePath]);
+    },
+    onSuccess: () => {
+      toast.success("Evaluation started");
+    },
+    onError: () => {
+      toast.error("Failed to start evaluation");
+    },
+    onSettled: (_, __, imagePath) => {
+      setEvaluating((prev) => prev.filter((p) => p !== imagePath));
+    },
   });
 
   const [models, setModels] = useState<string[]>([]);
@@ -144,8 +167,14 @@ export default function GenerateImages() {
                 <ChannelLabel channel={img.channel} model={img.model} />
               </section>
             </div>
-            <Button variant="default" size="sm" className="w-full">
-              Evaluate
+            <Button
+              variant="default"
+              size="sm"
+              className="w-full"
+              disabled={evaluating.includes(img.imagePath)}
+              onClick={() => evalMutation.mutate(img.imagePath)}
+            >
+              {evaluating.includes(img.imagePath) ? "Starting..." : "Evaluate"}
             </Button>
             <p className=" text-stone-400 text-xs text-center">
               {img?._count?.evaluations ?? 0} evaluations
