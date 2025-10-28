@@ -12,6 +12,7 @@ import {
 import { Tab } from "@/lib/types/nuqs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import { Brain, Building2Icon, TestTubeDiagonal } from "lucide-react";
 
 const fetchPending = async () => {
   const res = await axios.get<{
@@ -24,14 +25,17 @@ const items = [
   {
     title: "Brands",
     url: `/admin/dashboard?tab=${Tab.Brands}`,
+    icon: <Building2Icon className="w-4 h-4" />,
   },
   {
     title: "Generated Images",
     url: `/admin/dashboard?tab=${Tab.GeneratedImages}`,
+    icon: <Brain className="w-4 h-4" />,
   },
   {
     title: "Evaluated Images",
     url: `/admin/dashboard?tab=${Tab.EvaluatedImages}`,
+    icon: <TestTubeDiagonal className="w-4 h-4" />,
   },
 ];
 export function AppSidebar() {
@@ -57,7 +61,9 @@ export function AppSidebar() {
                       href={item.url}
                       className="flex w-full items-center justify-between gap-2 px-2 py-1 rounded hover:bg-sidebar-accent"
                     >
-                      <span>{item.title}</span>
+                      <span className="flex items-center gap-2">
+                        {item.icon} {item.title}
+                      </span>
                       {isEvaluated && count > 0 && (
                         <span className="animate-pulse bg-red-500 text-white rounded-full text-[10px] px-1.5">
                           {count}
