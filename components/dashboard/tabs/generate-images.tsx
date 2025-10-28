@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Channel } from "@/generated/prisma";
+import { cn } from "@/lib/utils";
+import { sourceCodePro } from "@/lib/fonts";
 
 const fetchImages = async (): Promise<ImagesResponse> => {
   try {
@@ -121,7 +123,14 @@ export default function GenerateImages() {
           >
             <Media img={img} />
             <section>
-              <p className="text-sm">{img.prompt}</p>
+              <p
+                className={cn(
+                  "text-sm text-stone-600",
+                  sourceCodePro.className
+                )}
+              >
+                {img.prompt}
+              </p>
               <ChannelLabel channel={img.channel} model={img.model} />
             </section>
           </div>
