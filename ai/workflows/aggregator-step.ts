@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { aggregateScores } from "../agents/aggregator";
 
-const AggregatorStep = createStep({
+const aggregatorStep = createStep({
   id: "aggregator-step",
   description:
     "Runs all evaluation agents in parallel and aggregates their scores into a final endScore and confidence.",
@@ -97,4 +97,4 @@ const AggregatorStep = createStep({
   },
 });
 
-export default AggregatorStep;
+export default aggregatorStep;
