@@ -8,6 +8,7 @@ export interface ImageMetadata {
   wUnits: string;
   hUnits: string;
   sizeBytes: number;
+  aspectRatio: number;
 }
 
 export async function getImageMetadata(url: string): Promise<ImageMetadata> {
@@ -22,6 +23,7 @@ export async function getImageMetadata(url: string): Promise<ImageMetadata> {
     mime,
     wUnits,
     hUnits,
+    aspectRatio: width / height,
   } as ImageMetadata;
 }
 
