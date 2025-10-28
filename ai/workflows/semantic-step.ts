@@ -3,6 +3,7 @@ import { z } from "zod";
 import semanticsAgent from "../agents/semantics-agent";
 import { SemanticOutputSchema } from "../../lib/types/workflow/semantic";
 import openai from "../providers/open-ai";
+import { cacheLLM } from "@/lib/llm-cache";
 
 const semanticWorkflow = createStep({
   id: "semantic-workflow",
@@ -19,23 +20,25 @@ const semanticWorkflow = createStep({
     }
     const { originalPrompt, imageUrl } = inputData;
 
-    const response = await semanticsAgent.generate(
-      [
+    const response = await cacheLLM("semantics", { originalPrompt }, () =>
+      semanticsAgent.generate(
+        [
+          {
+            role: "user",
+            content: `Original prompt: ${originalPrompt}\nImage URL: ${imageUrl}`,
+          },
+        ],
         {
-          role: "user",
-          content: `Original prompt: ${originalPrompt}\nImage URL: ${imageUrl}`,
-        },
-      ],
-      {
-        structuredOutput: {
-          schema: z.object({
-            score: z.number(),
-            matchedKeywords: z.array(z.string()),
-            similarity: z.number(),
-          }),
-          model: openai("gpt-4.1-nano"),
-        },
-      }
+          structuredOutput: {
+            schema: z.object({
+              score: z.number(),
+              matchedKeywords: z.array(z.string()),
+              similarity: z.number(),
+            }),
+            model: openai("gpt-4.1-nano"),
+          },
+        }
+      )
     );
     return response.object;
   },

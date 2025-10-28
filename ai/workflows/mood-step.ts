@@ -3,6 +3,7 @@ import { z } from "zod";
 import moodAgent from "../agents/mood-agent";
 import { MoodOutputSchema } from "../../lib/types/workflow/mood";
 import openai from "../providers/open-ai";
+import { cacheLLM } from "@/lib/llm-cache";
 
 const moodWorkflow = createStep({
   id: "mood-workflow",
@@ -19,24 +20,26 @@ const moodWorkflow = createStep({
     }
     const { originalPrompt, imageUrl } = inputData;
 
-    const response = await moodAgent.generate(
-      [
+    const response = await cacheLLM("mood", { imageUrl }, () =>
+      moodAgent.generate(
+        [
+          {
+            role: "user",
+            content: `Original prompt: ${originalPrompt}\nImage URL: ${imageUrl}`,
+          },
+        ],
         {
-          role: "user",
-          content: `Original prompt: ${originalPrompt}\nImage URL: ${imageUrl}`,
-        },
-      ],
-      {
-        structuredOutput: {
-          schema: z.object({
-            score: z.number(),
-            moodPrompt: z.array(z.string()),
-            moodImage: z.array(z.string()),
-            matchScore: z.number(),
-          }),
-          model: openai("gpt-4.1-nano"),
-        },
-      }
+          structuredOutput: {
+            schema: z.object({
+              score: z.number(),
+              moodPrompt: z.array(z.string()),
+              moodImage: z.array(z.string()),
+              matchScore: z.number(),
+            }),
+            model: openai("gpt-4.1-nano"),
+          },
+        }
+      )
     );
     return response.object;
   },

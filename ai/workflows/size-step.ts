@@ -3,6 +3,7 @@ import { z } from "zod";
 import sizeAgent from "../agents/size-agent";
 import { SizeOutputSchema } from "../../lib/types/workflow/size";
 import openai from "../providers/open-ai";
+import { cacheLLM } from "@/lib/llm-cache";
 
 const sizeWorkflow = createStep({
   id: "size-workflow",
@@ -19,23 +20,25 @@ const sizeWorkflow = createStep({
     }
     const { originalPrompt, imageUrl, channel } = inputData;
 
-    const response = await sizeAgent.generate(
-      [
+    const response = await cacheLLM("size", { imageUrl, channel }, () =>
+      sizeAgent.generate(
+        [
+          {
+            role: "user",
+            content: `Original prompt: ${originalPrompt}\nImage URL: ${imageUrl}\nChannel: ${channel}`,
+          },
+        ],
         {
-          role: "user",
-          content: `Original prompt: ${originalPrompt}\nImage URL: ${imageUrl}\nChannel: ${channel}`,
-        },
-      ],
-      {
-        structuredOutput: {
-          schema: z.object({
-            score: z.number(),
-            matches: z.boolean(),
-            details: z.string(),
-          }),
-          model: openai("gpt-4.1-nano"),
-        },
-      }
+          structuredOutput: {
+            schema: z.object({
+              score: z.number(),
+              matches: z.boolean(),
+              details: z.string(),
+            }),
+            model: openai("gpt-4.1-nano"),
+          },
+        }
+      )
     );
     return response.object;
   },

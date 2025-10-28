@@ -3,6 +3,7 @@ import { z } from "zod";
 import creativityAgent from "../agents/creativity-agent";
 import { CreativityOutputSchema } from "../../lib/types/workflow/creativity";
 import openai from "../providers/open-ai";
+import { cacheLLM } from "@/lib/llm-cache";
 
 const creativityWorkflow = createStep({
   id: "creativity-workflow",
@@ -19,26 +20,28 @@ const creativityWorkflow = createStep({
     }
     const { originalPrompt, imageUrl } = inputData;
 
-    const response = await creativityAgent.generate(
-      [
+    const response = await cacheLLM("creativity", { imageUrl }, () =>
+      creativityAgent.generate(
+        [
+          {
+            role: "user",
+            content: `Original prompt: ${originalPrompt}\nImage URL: ${imageUrl}`,
+          },
+        ],
         {
-          role: "user",
-          content: `Original prompt: ${originalPrompt}\nImage URL: ${imageUrl}`,
-        },
-      ],
-      {
-        structuredOutput: {
-          schema: z.object({
-            score: z.number(),
-            factors: z.object({
-              colorVariance: z.number(),
-              entropy: z.number(),
-              promptTokenVariety: z.number(),
+          structuredOutput: {
+            schema: z.object({
+              score: z.number(),
+              factors: z.object({
+                colorVariance: z.number(),
+                entropy: z.number(),
+                promptTokenVariety: z.number(),
+              }),
             }),
-          }),
-          model: openai("gpt-4.1-nano"),
-        },
-      }
+            model: openai("gpt-4.1-nano"),
+          },
+        }
+      )
     );
     return response.object;
   },
