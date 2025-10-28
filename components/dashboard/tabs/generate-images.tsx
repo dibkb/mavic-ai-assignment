@@ -68,6 +68,7 @@ export default function GenerateImages() {
     const tB = new Date(b.createdAt).getTime();
     return order === "asc" ? tA - tB : tB - tA;
   });
+  console.log(sortedImages);
 
   return (
     <section className="space-y-4">
@@ -128,23 +129,28 @@ export default function GenerateImages() {
       </div>
       <div className="grid grid-cols-3 gap-4">
         {sortedImages.map((img: Image) => (
-          <div
-            key={img.imagePath}
-            className="border p-2 rounded-md space-y-2 flex flex-col justify-between"
-          >
-            <Media img={img} />
-            <section>
-              <p
-                className={cn(
-                  "text-sm text-stone-600",
-                  sourceCodePro.className
-                )}
-              >
-                {img.prompt}
-              </p>
-              <ChannelLabel channel={img.channel} model={img.model} />
-            </section>
-          </div>
+          <section key={img.imagePath} className="space-y-2">
+            <div className="border p-2 rounded-md space-y-2 flex flex-col justify-between">
+              <Media img={img} />
+              <section>
+                <p
+                  className={cn(
+                    "text-sm text-stone-600",
+                    sourceCodePro.className
+                  )}
+                >
+                  {img.prompt}
+                </p>
+                <ChannelLabel channel={img.channel} model={img.model} />
+              </section>
+            </div>
+            <Button variant="default" size="sm" className="w-full">
+              Evaluate
+            </Button>
+            <p className=" text-stone-400 text-xs text-center">
+              {img?._count?.evaluations ?? 0} evaluations
+            </p>
+          </section>
         ))}
       </div>
     </section>

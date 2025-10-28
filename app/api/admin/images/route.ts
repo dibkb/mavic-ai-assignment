@@ -32,6 +32,9 @@ export async function GET(req: NextRequest) {
       brandId: true,
       createdAt: true,
       updatedAt: true,
+      _count: {
+        select: { evaluations: true },
+      },
     },
     orderBy: { createdAt: "desc" },
   });

@@ -11,6 +11,9 @@ export interface Image {
   brandId: string;
   createdAt: string;
   updatedAt: string;
+  _count: {
+    evaluations: number;
+  };
 }
 
 export interface ImagesResponse {
