@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma/client.js";
+import { Channel, PrismaClient } from "../generated/prisma/client.js";
 import fs from "fs";
 import path from "path";
 import { parse } from "csv-parse";
@@ -134,7 +134,7 @@ async function seed() {
           imagePath: p.imagePath,
           prompt: p.prompt,
           model: p.LLM_Model,
-          channel: p.channel,
+          channel: p.channel as Channel,
           timestamp: new Date(p.timeStamp),
           userId: user.id,
           brandId: brand.id,
