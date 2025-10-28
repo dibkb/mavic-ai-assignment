@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
         id: true,
         status: true,
         endScore: true,
+        evaluator: true,
         confidence: true,
         creativity: true,
         size: true,

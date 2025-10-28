@@ -23,6 +23,8 @@ export default function EvaluateImages() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["evaluations"],
     queryFn: fetchEvaluations,
+    // 3s refetch interval
+    refetchInterval: 3000,
   });
 
   if (isLoading) return <p>loading...</p>;
@@ -52,6 +54,7 @@ export default function EvaluateImages() {
                 </p>
               </section>
             </div>
+
             <EvaluationMetrics evaluation={ev} />
           </section>
         ))}

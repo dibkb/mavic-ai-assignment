@@ -8,6 +8,7 @@ export interface Evaluation {
   creativity: string | null;
   size: string | null;
   mood: string | null;
+  evaluator: string;
   semantics: string | null;
   createdAt: string;
   image: {

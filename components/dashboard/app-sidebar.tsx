@@ -7,12 +7,19 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { sourceCodePro } from "@/lib/fonts";
 import { Tab } from "@/lib/types/nuqs";
-import { cn } from "@/lib/utils";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+
+const fetchPending = async () => {
+  const res = await axios.get<{
+    pending: number;
+    processing: number;
+  }>("/api/admin/evaluations/pending");
+  return res.data;
+};
 const items = [
   {
     title: "Brands",
@@ -28,30 +35,38 @@ const items = [
   },
 ];
 export function AppSidebar() {
+  const { data } = useQuery({
+    queryKey: ["pending-evals"],
+    queryFn: fetchPending,
+    refetchInterval: 5000,
+  });
   return (
-    <Sidebar>
+    <Sidebar className="h-full">
       <SidebarHeader />
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Admin Dashboard</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <span
-                        className={cn(
-                          sourceCodePro.className,
-                          "font-medium text-sm"
-                        )}
-                      >
-                        {item.title}
-                      </span>
+              {items.map((item) => {
+                const isEvaluated = item.title === "Evaluated Images";
+                const count = (data?.pending ?? 0) + (data?.processing ?? 0);
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <a
+                      href={item.url}
+                      className="flex w-full items-center justify-between gap-2 px-2 py-1 rounded hover:bg-sidebar-accent"
+                    >
+                      <span>{item.title}</span>
+                      {isEvaluated && count > 0 && (
+                        <span className="animate-pulse bg-red-500 text-white rounded-full text-[10px] px-1.5">
+                          {count}
+                        </span>
+                      )}
                     </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

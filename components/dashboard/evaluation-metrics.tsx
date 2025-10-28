@@ -46,6 +46,9 @@ export default function EvaluationMetrics({
     <>
       <Separator />
       <table className="w-full text-xs">
+        <caption className="text-xs font-medium text-muted-foreground text-center my-2">
+          Evaluated by {evaluation.evaluator}
+        </caption>
         <thead className="text-left text-muted-foreground">
           <tr>
             <th className="py-1">Metric</th>
