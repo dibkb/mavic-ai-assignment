@@ -3,6 +3,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { Image, ImagesResponse } from "@/lib/types/image";
 import Media from "../media";
+import ChannelLabel from "../channel";
 
 const fetchImages = async (): Promise<ImagesResponse> => {
   try {
@@ -37,9 +38,7 @@ export default function GenerateImages() {
             <Media img={img} />
             <section>
               <p className="text-sm">{img.prompt}</p>
-              <p className="text-xs text-muted-foreground">
-                {img.model} • {img.channel}
-              </p>
+              <ChannelLabel channel={img.channel} model={img.model} />
             </section>
           </div>
         ))}
