@@ -1,19 +1,19 @@
 import { createStep } from "@mastra/core/workflows";
 import { z } from "zod";
-import sizeAgent from "../agents/size-agent";
+import semanticsAgent from "../agents/semantics-agent";
 import openai from "../providers/open-ai";
 
-const sizeWorkflow = createStep({
-  id: "size-workflow",
-  description: "Evaluates the size accuracy of a generated image",
+const semanticWorkflow = createStep({
+  id: "semantic-workflow",
+  description: "Evaluates the semantic accuracy of a generated image",
   inputSchema: z.object({
     originalPrompt: z.string(),
     imageUrl: z.url(),
   }),
   outputSchema: z.object({
     score: z.number(),
-    matches: z.boolean(),
-    details: z.string(),
+    matchedKeywords: z.array(z.string()),
+    similarity: z.number(),
   }),
   execute: async ({ inputData }) => {
     if (!inputData) {
@@ -21,7 +21,7 @@ const sizeWorkflow = createStep({
     }
     const { originalPrompt, imageUrl } = inputData;
 
-    const response = await sizeAgent.generate(
+    const response = await semanticsAgent.generate(
       [
         {
           role: "user",
@@ -32,8 +32,8 @@ const sizeWorkflow = createStep({
         structuredOutput: {
           schema: z.object({
             score: z.number(),
-            matches: z.boolean(),
-            details: z.string(),
+            matchedKeywords: z.array(z.string()),
+            similarity: z.number(),
           }),
           model: openai("gpt-4.1-nano"),
         },
@@ -43,4 +43,4 @@ const sizeWorkflow = createStep({
   },
 });
 
-export default sizeWorkflow;
+export default semanticWorkflow;
