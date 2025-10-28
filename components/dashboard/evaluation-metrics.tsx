@@ -1,10 +1,6 @@
 "use client";
 import { Evaluation } from "@/lib/types/evaluation";
 import { Separator } from "@/components/ui/separator";
-import CreativityMetric from "./metrics/creativity-metric";
-import SizeMetric from "./metrics/size-metric";
-import MoodMetric from "./metrics/mood-metric";
-import SemanticsMetric from "./metrics/semantics-metric";
 import MetricChip from "./metric-chip";
 
 export default function EvaluationMetrics({
@@ -50,20 +46,20 @@ export default function EvaluationMetrics({
                 evaluation.semantics as unknown as string | null
               ),
             },
-          ].map(({ label, score }) => (
+            {
+              label: "Evaluator",
+              value: evaluation.evaluator,
+            },
+          ].map(({ label, score, value }) => (
             <tr key={label} className="odd:bg-muted/30">
               <td className="py-1 px-2 text-muted-foreground w-1/2">{label}</td>
               <td className="py-1 px-2">
-                <MetricChip score={score} />
+                {score ? <MetricChip score={score} /> : value}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <CreativityMetric evaluation={evaluation} />
-      <SizeMetric evaluation={evaluation} />
-      <MoodMetric evaluation={evaluation} />
-      <SemanticsMetric evaluation={evaluation} />
     </>
   );
 }

@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import EvaluationMetrics from "../evaluation-metrics";
 import { Skeleton } from "@/components/ui/skeleton";
 import StatusChip from "@/components/dashboard/status-chip";
+import { EvalStatus } from "@/generated/prisma";
 
 const fetchEvaluations = async (): Promise<EvaluationsResponse> => {
   try {
@@ -49,7 +50,13 @@ export default function EvaluateImages() {
       </div>
       <div className="grid grid-cols-3 gap-4">
         {sortedEvaluations.map((ev: Evaluation) => (
-          <section key={ev.id} className="space-y-2">
+          <section
+            key={ev.id}
+            className={cn(
+              "space-y-2",
+              ev.status === EvalStatus.failed ? "opacity-50" : ""
+            )}
+          >
             <div className="border p-2 rounded-md space-y-2 flex flex-col justify-between">
               <Media
                 img={{
@@ -70,15 +77,20 @@ export default function EvaluateImages() {
               </section>
             </div>
 
-            {ev.status === "completed" ? (
+            {ev.status === EvalStatus.completed ? (
               <EvaluationMetrics evaluation={ev} />
-            ) : (
+            ) : ev.status === EvalStatus.pending ||
+              ev.status === EvalStatus.processing ? (
               <div className="space-y-2">
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-2/3" />
               </div>
-            )}
+            ) : ev.status === EvalStatus.failed ? (
+              <p className="text-sm text-stone-600 opacity-50">
+                Failed to evaluate
+              </p>
+            ) : null}
           </section>
         ))}
       </div>
