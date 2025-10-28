@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { createQueue } from "../lib/queue";
 import prisma from "@/lib/prisma";
+import { EvalStatus, Evaluation } from "@/generated/prisma";
 export const imageGraderQueueWorker = createQueue<{ imagePath: string }>(
   "image-grader",
   true
@@ -9,7 +10,7 @@ export const imageGraderQueueWorker = createQueue<{ imagePath: string }>(
 imageGraderQueueWorker.process(5, async (job) => {
   console.log(`⚙️ Processing image grader job`);
   const { imagePath } = job.data;
-  console.log(imagePath);
+  let evaluation: Evaluation | null = null;
   try {
     const image = await prisma.image.findFirst({
       where: {
@@ -17,11 +18,38 @@ imageGraderQueueWorker.process(5, async (job) => {
       },
     });
 
-    console.log(image);
     if (!image) {
       throw new Error("Image not found");
     }
+
+    evaluation = await prisma.evaluation.create({
+      data: {
+        imageId: image.id,
+        status: EvalStatus.pending,
+        evaluator: "gpt-4o-mini",
+      },
+    });
+
+    if (!evaluation) {
+      throw new Error("Evaluation record not found");
+    }
+
+    await prisma.evaluation.update({
+      where: { id: evaluation.id },
+      data: {
+        status: EvalStatus.processing,
+      },
+    });
+
+    await prisma.evaluation.update({
+      where: { id: evaluation.id },
+      data: { status: EvalStatus.completed },
+    });
   } catch (err) {
+    await prisma.evaluation.update({
+      where: { id: evaluation?.id },
+      data: { status: EvalStatus.failed },
+    });
     throw err;
   }
 });
