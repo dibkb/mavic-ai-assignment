@@ -10,18 +10,21 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { sourceCodePro } from "@/lib/fonts";
+import { Tab } from "@/lib/types/nuqs";
+import { cn } from "@/lib/utils";
 const items = [
   {
     title: "Brands",
-    url: "#",
+    url: `/admin/dashboard?tab=${Tab.Brands}`,
   },
   {
     title: "Generate Images",
-    url: "#",
+    url: `/admin/dashboard?tab=${Tab.GenerateImages}`,
   },
   {
     title: "Evaluated Images",
-    url: "#",
+    url: `/admin/dashboard?tab=${Tab.EvaluatedImages}`,
   },
 ];
 export function AppSidebar() {
@@ -37,7 +40,14 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
-                      <span>{item.title}</span>
+                      <span
+                        className={cn(
+                          sourceCodePro.className,
+                          "font-medium text-sm"
+                        )}
+                      >
+                        {item.title}
+                      </span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
