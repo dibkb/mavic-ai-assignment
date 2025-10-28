@@ -30,12 +30,17 @@ export default function GenerateImages() {
       <h2 className="text-xl font-semibold">Generated Images</h2>
       <div className="grid grid-cols-3 gap-4">
         {data?.images.map((img: Image) => (
-          <div key={img.imagePath} className="border p-2 rounded-md space-y-2">
+          <div
+            key={img.imagePath}
+            className="border p-2 rounded-md space-y-2 flex flex-col justify-between"
+          >
             <Media img={img} />
-            <p className="text-sm">{img.prompt}</p>
-            <p className="text-xs text-muted-foreground">
-              {img.model} • {img.channel}
-            </p>
+            <section>
+              <p className="text-sm">{img.prompt}</p>
+              <p className="text-xs text-muted-foreground">
+                {img.model} • {img.channel}
+              </p>
+            </section>
           </div>
         ))}
       </div>
