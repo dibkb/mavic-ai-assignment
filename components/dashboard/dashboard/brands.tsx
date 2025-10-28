@@ -1,5 +1,5 @@
 "use client";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { Brand } from "@/lib/types/brand";
 import { sourceCodePro } from "@/lib/fonts";
@@ -9,8 +9,15 @@ import { useState } from "react";
 import { ArrowDownNarrowWideIcon, ArrowUpNarrowWideIcon } from "lucide-react";
 
 const fetchBrands = async (): Promise<Brand[]> => {
-  const res = await axios.get<{ brands: Brand[] }>("/api/admin/brands");
-  return res.data.brands;
+  try {
+    const res = await axios.get<{ brands: Brand[] }>("/api/admin/brands");
+    return res.data.brands;
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 401) {
+      window.location.href = "/admin";
+    }
+    throw err;
+  }
 };
 
 export default function Brands() {
