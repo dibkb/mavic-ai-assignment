@@ -1,11 +1,15 @@
 "use client";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import SortToggle, { SortOrder } from "../sort-toggle";
 import { EvaluationsResponse, Evaluation } from "@/lib/types/evaluation";
 import Media from "../media";
 import { sourceCodePro } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import EvaluationMetrics from "../evaluation-metrics";
+import { Skeleton } from "@/components/ui/skeleton";
+import StatusChip from "@/components/dashboard/status-chip";
 
 const fetchEvaluations = async (): Promise<EvaluationsResponse> => {
   try {
@@ -26,15 +30,25 @@ export default function EvaluateImages() {
     // 3s refetch interval
     refetchInterval: 3000,
   });
+  const [order, setOrder] = useState<SortOrder>("desc");
 
   if (isLoading) return <p>loading...</p>;
   if (error) return <p>error loading evaluations</p>;
 
+  const sortedEvaluations = (data?.evaluations ?? []).slice().sort((a, b) => {
+    const tA = new Date(a.createdAt).getTime();
+    const tB = new Date(b.createdAt).getTime();
+    return order === "asc" ? tA - tB : tB - tA;
+  });
+
   return (
     <section className="space-y-4">
-      <h2 className="text-xl font-semibold">Evaluation Results</h2>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <h2 className="text-xl font-semibold">Evaluation Results</h2>
+        <SortToggle order={order} setOrder={setOrder} />
+      </div>
       <div className="grid grid-cols-3 gap-4">
-        {data?.evaluations.map((ev: Evaluation) => (
+        {sortedEvaluations.map((ev: Evaluation) => (
           <section key={ev.id} className="space-y-2">
             <div className="border p-2 rounded-md space-y-2 flex flex-col justify-between">
               <Media
@@ -52,10 +66,19 @@ export default function EvaluateImages() {
                 >
                   {ev.image.prompt}
                 </p>
+                <StatusChip status={ev.status} />
               </section>
             </div>
 
-            <EvaluationMetrics evaluation={ev} />
+            {ev.status === "completed" ? (
+              <EvaluationMetrics evaluation={ev} />
+            ) : (
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+            )}
           </section>
         ))}
       </div>

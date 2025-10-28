@@ -38,7 +38,7 @@ export function AppSidebar() {
   const { data } = useQuery({
     queryKey: ["pending-evals"],
     queryFn: fetchPending,
-    refetchInterval: 5000,
+    refetchInterval: 1000,
   });
   return (
     <Sidebar className="h-full">
