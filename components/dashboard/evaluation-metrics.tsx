@@ -2,6 +2,7 @@
 import { Evaluation } from "@/lib/types/evaluation";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { sourceCodePro } from "@/lib/fonts";
 
 function MetricChip({ score }: { score: number | null }) {
   const color =
@@ -80,6 +81,55 @@ export default function EvaluationMetrics({
           ))}
         </tbody>
       </table>
+      {metrics.map(({ key, label }) => {
+        const json = evaluation[key as keyof Evaluation] as unknown as
+          | string
+          | null;
+        if (!json) return null;
+
+        let obj: Record<string, unknown>;
+        try {
+          obj = JSON.parse(json);
+        } catch {
+          return null;
+        }
+
+        const flatten = (
+          o: Record<string, unknown>,
+          prefix = ""
+        ): [string, unknown][] =>
+          Object.entries(o).flatMap(([k, v]) => {
+            const path = prefix ? `${prefix}.${k}` : k;
+            return typeof v === "object" && v !== null
+              ? flatten(v as Record<string, unknown>, path)
+              : [[path, v]];
+          });
+
+        const rows = flatten(obj);
+
+        return (
+          <div
+            key={key}
+            className={cn("mt-4 space-y-1", sourceCodePro.className)}
+          >
+            <p className="text-xs font-medium text-muted-foreground">
+              {label} Details
+            </p>
+            <table className="w-full text-xs border rounded-md">
+              <tbody>
+                {rows.map(([k, v]) => (
+                  <tr key={k} className="odd:bg-muted/30">
+                    <td className="py-1 px-2 text-muted-foreground w-1/2 break-all">
+                      {k}
+                    </td>
+                    <td className="py-1 px-2 break-all">{String(v)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      })}
     </>
   );
 }
