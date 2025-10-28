@@ -86,18 +86,17 @@ _Weighted mean_: ∑ scoreᵢ·weightᵢ / ∑weightᵢ (default weight = 1).
 
 _Confidence_: 100 − σ (std-dev) clamped to \\[0,100\\]. High variance ⇒ lower confidence.
 
-## 7. Caching & Batching
+## 7. Caching
 
 - `lib/llm-cache.ts` hashes `(stepId, prompt, imagePath, …)` to a SHA-1 key stored in Redis for 14 days.
 - **Optimistic locking** avoids 🏃‍♂️ thundering-herd with a short `lock:<key>`.
-- _Benefit_: repeated grading of identical creatives is **~12× faster** & costs zero tokens.
-- API layer batches up to 5 prompts into a single OpenAI chat completion call when TTL cache miss occurs.
+- _Benefit_: repeated grading of identical creatives incurs zero extra token cost and returns instantly from cache.
 
 ## 8. Trade-offs
 
 | Decision                                      | Pros                                      | Cons                                                                               |
 | --------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------- |
-| LLM-driven creativity/mood vs hard heuristics | Captures nuance beyond simple histograms. | Cost & latency; mitigated via caching & batching.                                  |
+| LLM-driven creativity/mood vs hard heuristics | Captures nuance beyond simple histograms. | Cost & latency; mitigated via caching.                                             |
 | Polling UI instead of websockets              | Easiest to host (serverless-friendly).    | 2–3 s lag & extra queries.                                                         |
 | Separate agent JSON blobs                     | Flexible & independently evolvable.       | Querying inside dashboards needs projection helpers.                               |
 | Weighted mean aggregator                      | Transparent, tweakable per-brand.         | Ignores nonlinear interactions between metrics – could upgrade to small MLP later. |
