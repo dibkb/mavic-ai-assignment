@@ -1,5 +1,5 @@
 export enum Tab {
   Brands = "brands",
-  GenerateImages = "generate-images",
+  GeneratedImages = "generated-images",
   EvaluatedImages = "evaluated-images",
 }

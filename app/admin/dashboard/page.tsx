@@ -1,7 +1,7 @@
 "use client";
-import Brands from "@/components/dashboard/dashboard/brands";
-import EvaluateImages from "@/components/dashboard/dashboard/evaluate-images";
-import GenerateImages from "@/components/dashboard/dashboard/generate-images";
+import Brands from "@/components/dashboard/tabs/brands";
+import EvaluateImages from "@/components/dashboard/tabs/evaluate-images";
+import GenerateImages from "@/components/dashboard/tabs/generate-images";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -14,14 +14,18 @@ import { Tab } from "@/lib/types/nuqs";
 import { useQueryState } from "nuqs";
 import { z } from "zod";
 
-const TabSchema = z.enum([Tab.Brands, Tab.GenerateImages, Tab.EvaluatedImages]);
+const TabSchema = z.enum([
+  Tab.Brands,
+  Tab.GeneratedImages,
+  Tab.EvaluatedImages,
+]);
 
 export default function Dashboard() {
   const [tab] = useQueryState("tab", TabSchema.default(Tab.Brands));
 
   let content: React.ReactNode;
   switch (tab as Tab) {
-    case Tab.GenerateImages:
+    case Tab.GeneratedImages:
       content = <GenerateImages />;
       break;
     case Tab.EvaluatedImages:
@@ -34,7 +38,7 @@ export default function Dashboard() {
 
   const tabLabelMap: Record<Tab, string> = {
     [Tab.Brands]: "Brands",
-    [Tab.GenerateImages]: "Generate Images",
+    [Tab.GeneratedImages]: "Generated Images",
     [Tab.EvaluatedImages]: "Evaluated Images",
   };
 

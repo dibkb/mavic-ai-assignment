@@ -19,8 +19,8 @@ const items = [
     url: `/admin/dashboard?tab=${Tab.Brands}`,
   },
   {
-    title: "Generate Images",
-    url: `/admin/dashboard?tab=${Tab.GenerateImages}`,
+    title: "Generated Images",
+    url: `/admin/dashboard?tab=${Tab.GeneratedImages}`,
   },
   {
     title: "Evaluated Images",
