@@ -1,4 +1,7 @@
 "use client";
+import Brands from "@/components/dashboard/dashboard/brands";
+import EvaluateImages from "@/components/dashboard/dashboard/evaluate-images";
+import GenerateImages from "@/components/dashboard/dashboard/generate-images";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -19,14 +22,14 @@ export default function Dashboard() {
   let content: React.ReactNode;
   switch (tab as Tab) {
     case Tab.GenerateImages:
-      content = <div>Generate Images content</div>;
+      content = <GenerateImages />;
       break;
     case Tab.EvaluatedImages:
-      content = <div>Evaluated Images content</div>;
+      content = <EvaluateImages />;
       break;
     case Tab.Brands:
     default:
-      content = <div>Brands content</div>;
+      content = <Brands />;
   }
 
   const tabLabelMap: Record<Tab, string> = {
