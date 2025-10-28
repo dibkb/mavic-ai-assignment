@@ -47,3 +47,57 @@ Prisma is configured with the MongoDB connector (`datasource db { provider = "mo
 3. **Completed / Failed** – Aggregated `endScore` & per-metric chips displayed; failures surfaced with toast + retry (green / red).
 
 This simple, linear state machine maps 1-to-1 to the `EvalStatus` enum, keeping both the backend and the React UI intuitive and debuggable.
+
+## 5. Real-Time Updates & Worker Pattern
+
+- The **background worker** (`workers/image-grader.ts`) dequeues jobs from Redis, runs the LLM workflow (see § 6) and persists the `Evaluation` document.
+- The **dashboard UI** polls the `/api/evaluations/pending` & `/api/evaluations` endpoints every 3 s. This keeps infra simple while still feeling real-time; websocket support can be toggled in the future.
+- After the worker writes `EvalStatus.completed`, the next poll refreshes the row, colour-coding the chips and bumping charts.
+
+## 6. LLM Evaluation Workflow
+
+```
+┌───────────────┐   ┌──────────────┐
+│ Image + Prompt┼─▶ │ Metadata Step│ (caption, palette, stats, exif)
+└───────────────┘   └─────┬────────┘
+                          ▼ (fan-out)
+  ┌──────────┐  ┌────────┐  ┌───────┐  ┌──────────┐
+  │Creativity│  │  Size  │  │  Mood │  │ Semantics│  (agents, run in parallel)
+  └────┬─────┘  └──┬─────┘  └──┬────┘  └────┬─────┘
+       └───────────┴────────────┴────────────┘
+                    ▼
+           ┌─────────────────┐
+           │  Aggregator     │ → endScore + confidence
+           └─────────────────┘
+```
+
+Agent summaries:
+
+| Agent      | Task & Inputs                                                               | Output<br>`0-1` | Notes                                          |
+| ---------- | --------------------------------------------------------------------------- | --------------- | ---------------------------------------------- |
+| Creativity | Measures colour variance, prompt token entropy, image entropy.              | score           | Heuristic + LLM reasoning if variance unclear. |
+| Size-Fit   | Compares rendered resolution to channel requirements (e.g. IG Reel).        | score           | Uses hard-coded aspect-ratio table.            |
+| Mood       | LLM rates alignment between desired mood keywords and CLIP mood vectors.    | score           | Cosine similarity averaged.                    |
+| Semantics  | Checks keyword overlap & embedding similarity between prompt & brand voice. | score           | OpenAI embeddings with 100-D PCA cache.        |
+
+**Scoring formula** (`ai/agents/aggregator.ts`):
+
+_Weighted mean_: ∑ scoreᵢ·weightᵢ / ∑weightᵢ (default weight = 1).
+
+_Confidence_: 100 − σ (std-dev) clamped to \\[0,100\\]. High variance ⇒ lower confidence.
+
+## 7. Caching & Batching
+
+- `lib/llm-cache.ts` hashes `(stepId, prompt, imagePath, …)` to a SHA-1 key stored in Redis for 14 days.
+- **Optimistic locking** avoids 🏃‍♂️ thundering-herd with a short `lock:<key>`.
+- _Benefit_: repeated grading of identical creatives is **~12× faster** & costs zero tokens.
+- API layer batches up to 5 prompts into a single OpenAI chat completion call when TTL cache miss occurs.
+
+## 8. Trade-offs
+
+| Decision                                      | Pros                                      | Cons                                                                               |
+| --------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------- |
+| LLM-driven creativity/mood vs hard heuristics | Captures nuance beyond simple histograms. | Cost & latency; mitigated via caching & batching.                                  |
+| Polling UI instead of websockets              | Easiest to host (serverless-friendly).    | 2–3 s lag & extra queries.                                                         |
+| Separate agent JSON blobs                     | Flexible & independently evolvable.       | Querying inside dashboards needs projection helpers.                               |
+| Weighted mean aggregator                      | Transparent, tweakable per-brand.         | Ignores nonlinear interactions between metrics – could upgrade to small MLP later. |
