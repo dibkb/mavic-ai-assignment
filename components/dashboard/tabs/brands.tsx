@@ -1,12 +1,11 @@
 "use client";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { Brand } from "@/lib/types/brand";
 import { sourceCodePro } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { ArrowDownNarrowWideIcon, ArrowUpNarrowWideIcon } from "lucide-react";
+import SortToggle from "../sort-toggle";
 
 const fetchBrands = async (): Promise<Brand[]> => {
   try {
@@ -40,25 +39,7 @@ export default function Brands() {
   return (
     <section className="space-y-4">
       <h2 className="text-xl font-semibold">Brands</h2>
-      <div className="flex items-center gap-2">
-        <span className="text-sm">Sort:</span>
-        <Button
-          variant={order === "asc" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setOrder("asc")}
-        >
-          <ArrowDownNarrowWideIcon className="size-4" />
-          Oldest
-        </Button>
-        <Button
-          variant={order === "desc" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setOrder("desc")}
-        >
-          <ArrowUpNarrowWideIcon className="size-4" />
-          Newest
-        </Button>
-      </div>
+      <SortToggle order={order} setOrder={setOrder} />
 
       <ul className="space-y-2">
         {sorted.map((b: Brand) => (
