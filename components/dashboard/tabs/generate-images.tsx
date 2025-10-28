@@ -69,6 +69,8 @@ export default function GenerateImages() {
     return order === "asc" ? tA - tB : tB - tA;
   });
 
+  console.log(sortedImages);
+
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-4 flex-wrap">

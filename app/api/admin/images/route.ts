@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
 
   const images = await prisma.image.findMany({
     select: {
+      id: true,
       imagePath: true,
       prompt: true,
       model: true,

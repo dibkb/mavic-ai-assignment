@@ -1,6 +1,7 @@
 import { Channel } from "@/generated/prisma";
 
 export interface Image {
+  id: string;
   imagePath: string;
   prompt: string;
   model: string;

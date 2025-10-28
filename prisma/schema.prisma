@@ -72,15 +72,24 @@ enum Channel {
 }
 
 model Evaluation {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  image     Image      @relation(fields: [imageId], references: [id])
-  imageId   String     @db.ObjectId
-  status    EvalStatus @default(pending)
-  evaluator String
-  agents    Json
-  endScore  Float
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  image      Image      @relation(fields: [imageId], references: [id])
+  imageId    String     @db.ObjectId
+  status     EvalStatus @default(pending)
+  evaluator  String
+
+  // Aggregated results
+  endScore   Float
+  confidence Int        // 0–100
+
+  // Detailed agent outputs stored as flexible JSON blobs for ease of querying
+  creativity Json       // { score, factors { colorVariance, entropy, promptTokenVariety } }
+  size       Json       // { score, matches, details, channel? }
+  mood       Json       // { score, moodPrompt[], moodImage[], matchScore }
+  semantics  Json       // { score, matchedKeywords[], similarity }
+
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 enum EvalStatus {
