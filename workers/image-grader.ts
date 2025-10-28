@@ -5,14 +5,14 @@ import { EvalStatus, Evaluation } from "@/generated/prisma";
 import { gradeImageWorkflow } from "@/ai/workflows/grade-image-workflow";
 import { AggregatorOutput } from "@/lib/types/workflow/aggregator";
 import { JsonValue } from "@/generated/prisma/runtime/library";
-export const imageGraderQueueWorker = createQueue<{ imagePath: string }>(
-  "image-grader",
-  true
-);
+export const imageGraderQueueWorker = createQueue<{
+  imagePath: string;
+  evaluationId: string;
+}>("image-grader", true);
 
 imageGraderQueueWorker.process(5, async (job) => {
   console.log(`⚙️ Processing image grader job`);
-  const { imagePath } = job.data;
+  const { imagePath, evaluationId } = job.data;
   let evaluation: Evaluation | null = null;
   try {
     const image = await prisma.image.findFirst({
@@ -25,20 +25,17 @@ imageGraderQueueWorker.process(5, async (job) => {
       throw new Error("Image not found");
     }
 
-    evaluation = await prisma.evaluation.create({
-      data: {
-        imageId: image.id,
-        status: EvalStatus.pending,
-        evaluator: "gpt-4o-mini",
-      },
-    });
-
+    if (evaluationId) {
+      evaluation = await prisma.evaluation.findUnique({
+        where: { id: evaluationId },
+      });
+    }
     if (!evaluation) {
-      throw new Error("Evaluation record not found");
+      throw new Error("Evaluation not found");
     }
 
     await prisma.evaluation.update({
-      where: { id: evaluation.id },
+      where: { id: evaluationId },
       data: {
         status: EvalStatus.processing,
       },

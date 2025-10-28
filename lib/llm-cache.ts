@@ -16,7 +16,6 @@ export async function cacheLLM<T>(
     .digest("hex");
   const key = `${stepId}:${hash}`;
   const cached = await redis.get(key);
-  console.log(` cached ${stepId} with key ${key} and ttl ${ttl}`);
   if (cached) return JSON.parse(cached) as T;
   const lockKey = `lock:${key}`;
   const hasLock = (await redis.setnx(lockKey, "1")) === 1;
@@ -31,7 +30,6 @@ export async function cacheLLM<T>(
   try {
     const result = await callFn();
     await redis.set(key, JSON.stringify(result), "EX", ttl);
-    console.log(` set ${stepId} with key ${key} and ttl ${ttl}`);
     return result;
   } finally {
     await redis.del(lockKey);
