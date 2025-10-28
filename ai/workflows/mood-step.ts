@@ -1,6 +1,6 @@
 import { createStep } from "@mastra/core/workflows";
 import { z } from "zod";
-import creativityAgent from "../agents/creativity-agent";
+import moodAgent from "../agents/mood-agent";
 import openai from "../providers/open-ai";
 
 const moodWorkflow = createStep({
@@ -22,7 +22,7 @@ const moodWorkflow = createStep({
     }
     const { originalPrompt, imageUrl } = inputData;
 
-    const response = await creativityAgent.generate(
+    const response = await moodAgent.generate(
       [
         {
           role: "user",
