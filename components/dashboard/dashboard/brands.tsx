@@ -1,16 +1,9 @@
 "use client";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-
-export interface Brand {
-  brandName: string;
-  brandDescription: string;
-  style: string;
-  brandVision: string;
-  brandVoice: string;
-  colors: string[];
-  createdAt: string;
-}
+import { Brand } from "@/lib/types/brand";
+import { sourceCodePro } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
 
 const fetchBrands = async (): Promise<Brand[]> => {
   const res = await axios.get<{ brands: Brand[] }>("/api/admin/brands");
@@ -18,7 +11,7 @@ const fetchBrands = async (): Promise<Brand[]> => {
 };
 
 export default function Brands() {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<Brand[]>({
     queryKey: ["brands"],
     queryFn: fetchBrands,
   });
@@ -31,11 +24,36 @@ export default function Brands() {
       <h2 className="text-xl font-semibold">Brands</h2>
       <ul className="space-y-2">
         {data?.map((b: Brand) => (
-          <li key={b.brandName} className="border p-4 rounded-md">
-            <h3 className="font-medium">{b.brandName}</h3>
-            <p className="text-sm text-muted-foreground">
-              {b.brandDescription}
+          <li key={b.brandName} className="border p-4 rounded-md space-y-2">
+            <h3 className="font-medium text-lg">{b.brandName}</h3>
+            <p className="text-xs text-muted-foreground">
+              Created&nbsp;{new Date(b.createdAt).toLocaleDateString()}
             </p>
+            <dl className="grid grid-cols-4 gap-x-2 gap-y-1 text-sm">
+              <dt className="font-medium col-span-1">Description</dt>
+              <dd className="col-span-3 text-muted-foreground">
+                {b.brandDescription}
+              </dd>
+              <dt className="font-medium col-span-1">Style</dt>
+              <dd className="col-span-3 text-muted-foreground">{b.style}</dd>
+              <dt className="font-medium col-span-1">Vision</dt>
+              <dd className="col-span-3 text-muted-foreground">
+                {b.brandVision}
+              </dd>
+              <dt className="font-medium col-span-1">Voice</dt>
+              <dd className="col-span-3 text-muted-foreground">
+                {b.brandVoice}
+              </dd>
+              <dt className="font-medium col-span-1">Colors</dt>
+              <dd
+                className={cn(
+                  "col-span-3 text-muted-foreground",
+                  sourceCodePro.className
+                )}
+              >
+                {b.colors.join(", ")}
+              </dd>
+            </dl>
           </li>
         ))}
       </ul>
