@@ -4,6 +4,7 @@ import sizeAgent from "@/ai/agents/size-agent";
 import { semanticsAgent } from "@/ai/agents/semantics-agent";
 import creativityAgent from "@/ai/agents/creativity-agent";
 import { moodAgent } from "@/ai/agents/mood-agent";
+import { gradeImageWorkflow } from "@/ai/workflows/grade-image-workflow";
 
 export const mastra = new Mastra({
   agents: {
@@ -12,5 +13,8 @@ export const mastra = new Mastra({
     semanticsAgent,
     creativityAgent,
     moodAgent,
+  },
+  workflows: {
+    gradeImageWorkflow,
   },
 });

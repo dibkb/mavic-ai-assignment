@@ -21,15 +21,17 @@ export const imagePaletteTool = createTool({
   id: "image-palette",
   description: "Get dominant color of an image and map to a mood category",
   inputSchema: z.object({
-    url: z.url(),
+    imageUrl: z
+      .string()
+      .describe("The URL of the image to get the palette for"),
   }),
   outputSchema: z.object({
     color: z.object({ r: z.number(), g: z.number(), b: z.number() }),
     mood: z.string(),
   }),
   execute: async ({ context }) => {
-    const { url } = context;
-    const buffer = await (await fetch(url)).arrayBuffer();
+    const { imageUrl } = context;
+    const buffer = await (await fetch(imageUrl.toString())).arrayBuffer();
     const img = sharp(Buffer.from(buffer));
     const { dominant } = await img.stats();
     const mood = classifyMood(dominant);
