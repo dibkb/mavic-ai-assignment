@@ -3,6 +3,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { geistMono, geistSans } from "@/lib/fonts";
+import { TanstackQueryProvider } from "@/components/query";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,7 +20,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NuqsAdapter>{children}</NuqsAdapter>
+        <TanstackQueryProvider>
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </TanstackQueryProvider>
         <Toaster />
       </body>
     </html>
