@@ -16,7 +16,7 @@ export const imageStatsTool = createTool({
   description:
     "Compute basic statistics (color variance, entropy) for an image URL",
   inputSchema: z.object({
-    url: z.url(),
+    imageUrl: z.string().describe("The URL of the image to get the stats for"),
   }),
   outputSchema: z.object({
     colorVariance: z.number(),
@@ -25,8 +25,8 @@ export const imageStatsTool = createTool({
     height: z.number(),
   }),
   execute: async ({ context }) => {
-    const { url } = context;
-    const res = await fetch(url);
+    const { imageUrl } = context;
+    const res = await fetch(imageUrl.toString());
     if (!res.ok) throw new Error("Failed to fetch image");
     const buffer = Buffer.from(await res.arrayBuffer());
     const img = sharp(buffer);
