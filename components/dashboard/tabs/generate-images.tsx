@@ -91,7 +91,6 @@ export default function GenerateImages() {
     const tB = new Date(b.createdAt).getTime();
     return order === "asc" ? tA - tB : tB - tA;
   });
-  console.log(sortedImages);
 
   return (
     <section className="space-y-4">

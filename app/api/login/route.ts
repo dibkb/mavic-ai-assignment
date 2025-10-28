@@ -13,8 +13,6 @@ export async function POST(req: NextRequest) {
     where: { userName: username, password: password, userRole: UserRole.admin },
   });
 
-  console.log(user, username, password);
-
   if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
