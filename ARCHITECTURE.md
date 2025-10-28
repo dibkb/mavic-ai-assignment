@@ -21,7 +21,7 @@ Prisma is configured with the MongoDB connector (`datasource db { provider = "mo
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | **User**       | Minimal auth fields (`userId`, `password`\*), role enum (`user`, `admin`) and 1-to-many `images`.                                         |
 | **Brand**      | Marketing profile used for prompt conditioning; array of brand colours stored as `String[]`.                                              |
-| **Image**      | Stores Midjourney/DALL-E renders together with provenance (`userId`, `brandId`) and the latest `endScore` for quick sorting.              |
+| **Image**      | Stores ai render together with provenance (`userId`, `brandId, used_prompt `)                                                             |
 | **Evaluation** | One document per image-run. Holds agent JSON blobs (`creativity`, `size`, `mood`, `semantics`) plus aggregated `endScore` & `confidence`. |
 
 \*Passwords are optional in this prototype – we rely on magic-link auth in production.
