@@ -1,6 +1,10 @@
 "use client";
 import { Evaluation } from "@/lib/types/evaluation";
 import { Separator } from "@/components/ui/separator";
+import CreativityMetric from "./metrics/creativity-metric";
+import SizeMetric from "./metrics/size-metric";
+import MoodMetric from "./metrics/mood-metric";
+import SemanticsMetric from "./metrics/semantics-metric";
 import MetricChip from "./metric-chip";
 
 export default function EvaluationMetrics({
@@ -60,6 +64,10 @@ export default function EvaluationMetrics({
           ))}
         </tbody>
       </table>
+      <CreativityMetric evaluation={evaluation} />
+      <SizeMetric evaluation={evaluation} />
+      <MoodMetric evaluation={evaluation} />
+      <SemanticsMetric evaluation={evaluation} />
     </>
   );
 }
